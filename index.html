@@ -246,39 +246,30 @@
         // Получаем данные билета из параметра 'data'
         const ticketDataEncoded = getQueryParam('data');
         
-        if (ticketDataEncoded) {
-            try {
-                // Декодируем данные из base64 и парсим JSON
-                const ticketDataJson = atob(ticketDataEncoded);
-                const ticketData = JSON.parse(ticketDataJson);
-                
-                // Форматируем номер билета (добавляем пробелы для читаемости)
-                const formattedTicketNumber = ticketData.number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-                
-                // Получаем текущую дату и время
-                const now = new Date();
-                const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-                const day = now.getDate();
-                const month = months[now.getMonth()];
-                const year = now.getFullYear();
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                
-                // Заполняем данные на странице
-                document.getElementById('order-id').textContent = formattedTicketNumber;
-                document.getElementById('carrier').textContent = ticketData.carrier;
-                document.getElementById('route').textContent = `${ticketData.route_number} ${ticketData.route_name}`;
-                document.getElementById('bus').textContent = ticketData.bus_number;
-                document.getElementById('price').textContent = `${ticketData.quantity} шт., Полный ${ticketData.total_price},00 ₽`;
-                document.getElementById('date').textContent = `${day} ${month} ${year} г.`;
-                document.getElementById('time').textContent = `${hours}:${minutes}`;
-            } catch (error) {
-                console.error('Ошибка при обработке данных билета:', error);
-                document.body.innerHTML = '<p>Ошибка загрузки билета. Неверный формат данных.</p>';
-            }
-        } else {
-            document.body.innerHTML = '<p>Данные билета не предоставлены.</p>';
+    if (ticketDataEncoded) {
+        try {
+            // Декодируем данные из base64 и парсим JSON
+            const ticketDataJson = atob(ticketDataEncoded);
+            const ticketData = JSON.parse(ticketDataJson);
+            
+            // Форматируем номер билета (добавляем пробелы для читаемости)
+            const formattedTicketNumber = ticketData.number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            
+            // Заполняем данные на странице
+            document.getElementById('order-id').textContent = formattedTicketNumber;
+            document.getElementById('carrier').textContent = ticketData.carrier;
+            document.getElementById('route').textContent = `${ticketData.route_number} ${ticketData.route_name}`;
+            document.getElementById('bus').textContent = ticketData.bus_number;
+            document.getElementById('price').textContent = `${ticketData.quantity} шт., Полный ${ticketData.total_price},00 ₽`;
+            document.getElementById('date').textContent = ticketData.purchase_date;  // Используем переданную дату
+            document.getElementById('time').textContent = ticketData.purchase_time;  // Используем переданное время
+        } catch (error) {
+            console.error('Ошибка при обработке данных билета:', error);
+            document.body.innerHTML = '<p>Ошибка загрузки билета. Неверный формат данных.</p>';
         }
+    } else {
+        document.body.innerHTML = '<p>Данные билета не предоставлены.</p>';
+    }
 
         // Таймер обратного отсчета
         function startTimer(duration, display) {
