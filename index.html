@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Транспортный билет</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         body {
             font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -71,6 +72,11 @@
             color: #E21A1A;
         }
 
+        .app__header .navbar span.active svg path {
+            fill: #E21A1A;
+            stroke: #E21A1A;
+        }
+
         .content-area {
             flex: 1;
             overflow: hidden;
@@ -128,7 +134,29 @@
             display: none;
             width: 100%;
             height: 100%;
-            border: none;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow-y: auto;
+        }
+
+        .qr-container {
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        #qrcode {
+            margin: 0 auto;
+        }
+
+        .ticket-number {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #D4D4D4;
         }
 
         .button__wrapper{
@@ -248,7 +276,12 @@
             </div>
         </div>
         
-        <iframe id="control-content" class="control-content" src="about:blank"></iframe>
+        <div id="control-content" class="control-content">
+            <div class="qr-container">
+                <div id="qrcode"></div>
+            </div>
+            <div class="ticket-number">№ <span id="control-ticket-number"></span></div>
+        </div>
     </div>
     
     <div class="button__wrapper">
@@ -267,6 +300,9 @@
             return urlParams.get(name);
         }
 
+        // Переменная для хранения номера билета без пробелов
+        let ticketNumberWithoutSpaces = '';
+
         // Получаем данные билета из параметра 'data'
         const ticketDataEncoded = getQueryParam('data');
         
@@ -276,8 +312,11 @@
                 const ticketDataJson = atob(ticketDataEncoded);
                 const ticketData = JSON.parse(ticketDataJson);
                 
+                // Сохраняем номер без пробелов для QR-кода
+                ticketNumberWithoutSpaces = ticketData.number.toString();
+                
                 // Форматируем номер билета (добавляем пробелы для читаемости)
-                const formattedTicketNumber = ticketData.number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+                const formattedTicketNumber = ticketNumberWithoutSpaces.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 
                 // Заполняем данные на странице
                 document.getElementById('order-id').textContent = formattedTicketNumber;
@@ -285,8 +324,12 @@
                 document.getElementById('route').textContent = `${ticketData.route_number} ${ticketData.route_name}`;
                 document.getElementById('bus').textContent = ticketData.bus_number;
                 document.getElementById('price').textContent = `${ticketData.quantity} шт., Полный ${ticketData.total_price},00 ₽`;
-                document.getElementById('date').textContent = ticketData.purchase_date;  // Используем переданную дату
-                document.getElementById('time').textContent = ticketData.purchase_time;  // Используем переданное время
+                document.getElementById('date').textContent = ticketData.purchase_date;
+                document.getElementById('time').textContent = ticketData.purchase_time;
+                
+                // Устанавливаем номер билета для контроля
+                document.getElementById('control-ticket-number').textContent = formattedTicketNumber;
+                
             } catch (error) {
                 console.error('Ошибка при обработке данных билета:', error);
                 document.body.innerHTML = '<p>Ошибка загрузки билета. Неверный формат данных.</p>';
@@ -315,12 +358,16 @@
             ticketContent.style.display = 'none';
             controlContent.style.display = 'block';
             
-            // Загружаем содержимое контроля только при первом клике
-            if (controlContent.src === 'about:blank') {
-                // Здесь должен быть URL к файлу CitybusBotWebApp.html
-                // В данном примере используется data URI с упрощенным содержимым
-                // В реальном приложении замените на правильный URL
-                controlContent.src = 'data:text/html;base64,PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PHN0eWxlPmJvZHl7YmFja2dyb3VuZDojMDAwO2NvbG9yOiNmZmY7Zm9udC1mYW1pbHk6QXJpYWw7cGFkZGluZzoyMHB4O3RleHQtYWxpZ246Y2VudGVyfWltZ3ttYXgtd2lkdGg6MTAwJTttYXJnaW46MCBhdXRvfTwvc3R5bGU+PC9oZWFkPjxib2R5PjxkaXY+PGgzPuaTjeS6pOaMieaJi+WKoOi9vTwvaDM+PGltZyBzcmM9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBQzBBQUFBdENBUUFBQUJ2U1BaWkFBQUFBWE5TUjBJQXJzNGM2UUFBSUFCSlJFRlVlQUh0blhVMGJNZFZJY1VKc0lBQUFBQkpSVTVFcmtKZ2dnPT0iPjxwPuaTjeS6pOaMieaJi+WKoOi9vTogPHN0cm9uZz4xIDIxNCAwODggNTM1PC9zdHJvbmc+PC9wPjwvZGl2PjwvYm9keT48L2h0bWw+';
+            // Генерируем QR-код только при первом клике
+            if (!document.getElementById('qrcode').hasChildNodes()) {
+                new QRCode(document.getElementById('qrcode'), {
+                    text: ticketNumberWithoutSpaces,
+                    width: 200,
+                    height: 200,
+                    colorDark : "#000000",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
             }
         });
 
