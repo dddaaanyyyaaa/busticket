@@ -23,6 +23,9 @@ function startTimer(duration, display) {
     }, 1000);
 }
 
+// Переменная для хранения номера билета без пробелов
+let ticketNumberWithoutSpaces = '';
+
 // НЕМЕДЛЕННАЯ инициализация после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
     // Получаем данные билета
@@ -33,15 +36,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const ticketDataJson = atob(ticketDataEncoded);
             const ticketData = JSON.parse(ticketDataJson);
             
-            const formattedTicketNumber = ticketData.number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            // Сохраняем номер без пробелов для QR-кода
+            ticketNumberWithoutSpaces = ticketData.number.toString();
+            
+            // Форматируем номер билета (добавляем пробелы для читаемости)
+            const formattedTicketNumber = ticketNumberWithoutSpaces.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
             
             document.getElementById('order-id').textContent = formattedTicketNumber;
             document.getElementById('carrier').textContent = ticketData.carrier;
-            document.getElementById('route').textContent = ticketData.route_name; // Убрали номер маршрута
+            document.getElementById('route').textContent = ticketData.route_name; // Только название маршрута
             document.getElementById('bus').textContent = ticketData.bus_number;
             document.getElementById('price').textContent = `${ticketData.quantity} шт., Полный ${ticketData.total_price},00 ₽`;
             document.getElementById('date').textContent = ticketData.purchase_date;
             document.getElementById('time').textContent = ticketData.purchase_time;
+            
+            // Устанавливаем номер билета для контроля
+            document.getElementById('control-ticket-number').textContent = formattedTicketNumber;
         } catch (error) {
             console.error('Ошибка при обработке данных билета:', error);
             document.body.innerHTML = '<p>Ошибка загрузки билета. Неверный формат данных.</p>';
@@ -51,6 +61,39 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.innerHTML = '<p>Данные билета не предоставлены.</p>';
         return;
     }
+
+    // Переменные для вкладок
+    const ticketTab = document.getElementById('ticket-tab');
+    const controlTab = document.getElementById('control-tab');
+    const ticketContent = document.getElementById('ticket-content');
+    const controlContent = document.getElementById('control-content');
+
+    // Обработчики клика по вкладкам
+    ticketTab.addEventListener('click', () => {
+        ticketTab.classList.add('active');
+        controlTab.classList.remove('active');
+        ticketContent.style.display = 'block';
+        controlContent.style.display = 'none';
+    });
+
+    controlTab.addEventListener('click', () => {
+        controlTab.classList.add('active');
+        ticketTab.classList.remove('active');
+        ticketContent.style.display = 'none';
+        controlContent.style.display = 'block';
+
+        // Генерируем QR-код только при первом клике
+        if (!document.getElementById('qrcode').hasChildNodes()) {
+            new QRCode(document.getElementById('qrcode'), {
+                text: ticketNumberWithoutSpaces,
+                width: 200,
+                height: 200,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+    });
 
     // НЕМЕДЛЕННЫЙ запуск таймера после заполнения данных
     const timerDisplay = document.getElementById('timer');
