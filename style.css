@@ -4,6 +4,9 @@ body {
     color: #D4D4D4;
     margin: 0;
     padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
 p{
@@ -13,6 +16,7 @@ p{
 .app__header{
     border-bottom: 1px solid #303030;
     padding-top: 10px;
+    flex-shrink: 0;
 }
 
 .app__header .effective{
@@ -40,6 +44,7 @@ p{
     display: flex;
     align-items: center;
     gap: 6px;
+    cursor: pointer;
 }
 
 .app__header .navbar span b{
@@ -56,6 +61,23 @@ p{
 .app__header .navbar span.active{
     border-color: #E21A1A;
     color: #E21A1A;
+}
+
+.app__header .navbar span.active svg path {
+    fill: #E21A1A;
+    stroke: #E21A1A;
+}
+
+.content-area {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.ticket-content {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .ticket__info{
@@ -103,16 +125,43 @@ p{
 
 .info__item:last-child{border-bottom: 0}
 
+.control-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.qr-container {
+    margin: 20px auto;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    display: inline-block;
+}
+
+#qrcode {
+    margin: 0 auto;
+}
+
+.ticket-number {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 20px;
+    color: #D4D4D4;
+}
+
 .button__wrapper{
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: static;
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
     padding: 10px 20px 30px;
     background: #1A1A1A;
+    flex-shrink: 0;
 }
 
 .button__wrapper button{
