@@ -134,7 +134,6 @@
             display: none;
             width: 100%;
             height: 100%;
-            border: none;
             padding: 20px;
             box-sizing: border-box;
             text-align: center;
@@ -213,7 +212,7 @@
             </span>
         </div>
     </div>
-
+    
     <div class="content-area">
         <div id="ticket-content" class="ticket__info">
             <div class="info__item">
@@ -276,8 +275,7 @@
                 </div>
             </div>
         </div>
-
-        <iframe id="control-content" class="control-content" src="about:blank"></iframe>
+        
         <div id="control-content" class="control-content">
             <div class="qr-container">
                 <div id="qrcode"></div>
@@ -285,7 +283,7 @@
             <div class="ticket-number">№ <span id="control-ticket-number"></span></div>
         </div>
     </div>
-
+    
     <div class="button__wrapper">
         <button id="close-button">закрыть</button>
     </div>
@@ -307,28 +305,25 @@
 
         // Получаем данные билета из параметра 'data'
         const ticketDataEncoded = getQueryParam('data');
-
+        
         if (ticketDataEncoded) {
             try {
                 // Декодируем данные из base64 и парсим JSON
                 const ticketDataJson = atob(ticketDataEncoded);
                 const ticketData = JSON.parse(ticketDataJson);
-
+                
                 // Сохраняем номер без пробелов для QR-кода
                 ticketNumberWithoutSpaces = ticketData.number.toString();
                 
                 // Форматируем номер билета (добавляем пробелы для читаемости)
-                const formattedTicketNumber = ticketData.number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
                 const formattedTicketNumber = ticketNumberWithoutSpaces.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
+                
                 // Заполняем данные на странице
                 document.getElementById('order-id').textContent = formattedTicketNumber;
                 document.getElementById('carrier').textContent = ticketData.carrier;
                 document.getElementById('route').textContent = `${ticketData.route_number} ${ticketData.route_name}`;
                 document.getElementById('bus').textContent = ticketData.bus_number;
                 document.getElementById('price').textContent = `${ticketData.quantity} шт., Полный ${ticketData.total_price},00 ₽`;
-                document.getElementById('date').textContent = ticketData.purchase_date;  // Используем переданную дату
-                document.getElementById('time').textContent = ticketData.purchase_time;  // Используем переданное время
                 document.getElementById('date').textContent = ticketData.purchase_date;
                 document.getElementById('time').textContent = ticketData.purchase_time;
                 
@@ -348,7 +343,7 @@
         const controlTab = document.getElementById('control-tab');
         const ticketContent = document.getElementById('ticket-content');
         const controlContent = document.getElementById('control-content');
-
+        
         // Обработчики клика по вкладкам
         ticketTab.addEventListener('click', () => {
             ticketTab.classList.add('active');
@@ -356,19 +351,13 @@
             ticketContent.style.display = 'block';
             controlContent.style.display = 'none';
         });
-
+        
         controlTab.addEventListener('click', () => {
             controlTab.classList.add('active');
             ticketTab.classList.remove('active');
             ticketContent.style.display = 'none';
             controlContent.style.display = 'block';
-
-            // Загружаем содержимое контроля только при первом клике
-            if (controlContent.src === 'about:blank') {
-                // Здесь должен быть URL к файлу CitybusBotWebApp.html
-                // В данном примере используется data URI с упрощенным содержимым
-                // В реальном приложении замените на правильный URL
-                controlContent.src = 'data:text/html;base64,PCFET0NUWVBFIGh0bWw+PGh0bWw+PGhlYWQ+PHN0eWxlPmJvZHl7YmFja2dyb3VuZDojMDAwO2NvbG9yOiNmZmY7Zm9udC1mYW1pbHk6QXJpYWw7cGFkZGluZzoyMHB4O3RleHQtYWxpZ246Y2VudGVyfWltZ3ttYXgtd2lkdGg6MTAwJTttYXJnaW46MCBhdXRvfTwvc3R5bGU+PC9oZWFkPjxib2R5PjxkaXY+PGgzPuaTjeS6pOaMieaJi+WKoOi9vTwvaDM+PGltZyBzcmM9ImRhdGE6aW1hZ2UvcG5nO2Jhc2U2NCxpVkJPUncwS0dnb0FBQUFOU1VoRVVnQUFBQzBBQUFBdENBUUFBQUJ2U1BaWkFBQUFBWE5TUjBJQXJzNGM2UUFBSUFCSlJFRlVlQUh0blhVMGJNZFZJY1VKc0lBQUFBQkpSVTVFcmtKZ2dnPT0iPjxwPuaTjeS6pOaMieaJi+WKoOi9vTogPHN0cm9uZz4xIDIxNCAwODggNTM1PC9zdHJvbmc+PC9wPjwvZGl2PjwvYm9keT48L2h0bWw+';
+            
             // Генерируем QR-код только при первом клике
             if (!document.getElementById('qrcode').hasChildNodes()) {
                 new QRCode(document.getElementById('qrcode'), {
@@ -400,7 +389,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const timerDisplay = document.getElementById('timer');
             const closeBtn = document.getElementById('close-button');
-
+            
             startTimer(15, timerDisplay);
             closeBtn.addEventListener('click', () => tg.close());
         });
