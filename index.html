@@ -377,7 +377,7 @@
             const interval = setInterval(() => {
                 seconds = parseInt(timer, 10);
                 display.textContent = seconds + " сек.";
-
+                startTimer(15, timerDisplay);
                 if (--timer < 0) {
                     clearInterval(interval);
                     tg.close();
@@ -390,7 +390,6 @@
             const timerDisplay = document.getElementById('timer');
             const closeBtn = document.getElementById('close-button');
             
-            startTimer(15, timerDisplay);
             closeBtn.addEventListener('click', () => tg.close());
         });
     </script>
