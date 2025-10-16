@@ -1,248 +1,291 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark" style="--tg-color-scheme: dark; --tg-theme-bg-color: #212121; --tg-theme-text-color: #ffffff; --tg-theme-hint-color: #aaaaaa; --tg-theme-link-color: #8774e1; --tg-theme-button-color: #8774e1; --tg-theme-button-text-color: #ffffff; --tg-theme-secondary-bg-color: #0f0f0f; --tg-theme-header-bg-color: #212121; --tg-theme-accent-text-color: #8774e1; --tg-theme-section-bg-color: #212121; --tg-theme-section-header-text-color: #aaaaaa; --tg-theme-subtitle-text-color: #aaaaaa; --tg-theme-destructive-text-color: #e53935;">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Транспортный билет</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+            background: #000000;
+            color: #D4D4D4;
             margin: 0;
             padding: 0;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #212121);
-            color: var(--tg-theme-text-color, #ffffff);
-            line-height: 1.5715;
-            height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            height: 100vh;
         }
 
-        .header {
+        p{
+            margin: 0;
+        }
+
+        .app__header{
+            border-bottom: 1px solid #303030;
+            padding-top: 10px;
+            flex-shrink: 0;
+        }
+
+        .app__header .effective{
+            font-size: 20px;
+            font-weight: 500;
+            color: #D4D4D4;
             text-align: center;
-            padding: 16px 0 0;
-            border-bottom: 1px solid #333;
+            margin-bottom: 25px;
         }
 
-        .timer {
-            font-size: 18px;
-            margin-bottom: 16px;
-            color: var(--tg-theme-text-color);
-        }
-
-        .tabs {
-            display: flex;
-            justify-content: center;
-            border-bottom: 1px solid #333;
-        }
-
-        .tab {
-            padding: 12px 16px;
+        .app__header .navbar{
             display: flex;
             align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            font-size: 16px;
-            color: var(--tg-theme-hint-color);
-            transition: all 0.2s;
-        }
-
-        .tab.active {
-            color: var(--tg-theme-accent-text-color);
-            border-bottom-color: var(--tg-theme-accent-text-color);
-        }
-
-        .tab i {
-            font-size: 18px;
-        }
-
-        .content {
-            flex: 1;
-            overflow: auto;
-            padding: 0;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 24px;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .ticket-info {
-            width: 100%;
-        }
-
-        .info-item {
-            display: flex;
-            align-items: flex-start;
-            padding: 12px 0;
-            border-bottom: 1px solid #333;
-        }
-
-        .info-item:last-child {
-            border-bottom: none;
-        }
-
-        .info-icon {
-            width: 40px;
-            display: flex;
             justify-content: center;
-            margin-right: 12px;
-            color: var(--tg-theme-accent-text-color);
+            gap: 20px;
         }
 
-        .info-icon i {
-            font-size: 20px;
+        .app__header .navbar span{
+            font-size: 16px;
+            color: #D4D4D4;
+            font-weight: 500;
+            padding: 0 13px 11px;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
         }
 
-        .info-content {
-            flex: 1;
-        }
-
-        .info-label {
-            font-size: 14px;
-            color: var(--tg-theme-hint-color);
-            margin-bottom: 4px;
-        }
-
-        .info-value {
-            font-size: 18px;
-            color: var(--tg-theme-text-color);
+        .app__header .navbar span b{
             font-weight: 500;
         }
 
+        .app__header .navbar span svg{
+            width: 18px;
+            height: 20px;
+            max-width: 100%;
+            display: block;
+        }
+
+        .app__header .navbar span.active{
+            border-color: #E21A1A;
+            color: #E21A1A;
+        }
+
+        .app__header .navbar span.active svg path {
+            fill: #E21A1A;
+            stroke: #E21A1A;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ticket__info{
+            padding: 15px 20px 0;
+            box-sizing: border-box;
+            width: 100%;
+            max-width: 100%;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .info__item{
+            border-bottom: 1px solid #303030;
+            padding: 6px 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .info__item .image{
+            min-width: 45px;
+            max-width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .info__item .image svg{
+            min-width: 24px;
+            max-width: 24px;
+            width: 24px;
+            display: block;
+        }
+
+        .info__item .data p{
+            font-size: 16px;
+            color: #787878;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .info__item .data div{
+            font-size: 22px;
+            color: #D4D4D4;
+            font-weight: 500;
+        }
+
+        .info__item:last-child{border-bottom: 0}
+
         .control-content {
-            text-align: center;
+            display: none;
+            width: 100%;
+            height: 100%;
             padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            overflow-y: auto;
         }
 
         .qr-container {
+            margin: 20px auto;
+            padding: 15px;
             background: white;
-            padding: 16px;
-            border-radius: 8px;
+            border-radius: 10px;
             display: inline-block;
-            margin: 20px 0;
+        }
+
+        #qrcode {
+            margin: 0 auto;
         }
 
         .ticket-number {
             font-size: 24px;
             font-weight: bold;
-            margin-top: 16px;
-            color: var(--tg-theme-text-color);
+            margin-top: 20px;
+            color: #D4D4D4;
         }
 
-        .footer {
-            padding: 16px 24px;
-            background: var(--tg-theme-secondary-bg-color);
-        }
-
-        .close-button {
+        .button__wrapper{
+            position: static;
             width: 100%;
-            padding: 12px 20px;
-            background: var(--tg-theme-button-color);
-            color: var(--tg-theme-button-text-color);
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            max-width: 100%;
+            box-sizing: border-box;
+            padding: 10px 20px 30px;
+            background: #1A1A1A;
+            flex-shrink: 0;
+        }
+
+        .button__wrapper button{
+            padding: 10px 20px;
+            color: #fff;
+            font-size: 17px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 10px;
+            background: #E21A1A;
+            outline: none;
+            border: none;
             cursor: pointer;
             text-transform: uppercase;
-        }
-
-        .hidden {
-            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="timer">Действует: <span id="timer">15 сек.</span></div>
-        <div class="tabs">
-            <div class="tab active" id="ticket-tab">
-                <i class="far fa-memo-circle-check"></i>
-                <span id="order-id">867 291 334</span>
-            </div>
-            <div class="tab" id="control-tab">
-                <i class="far fa-user-pilot"></i>
-                <span>Контроль</span>
-            </div>
+    <div class="app__header">
+        <div class="effective">Действует: <span id="timer">15 сек.</span></div>
+        <div class="navbar">
+            <span class="active" id="ticket-tab">
+                <svg width="28" height="30" viewBox="0 0 28 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.5 0H3.5C2.57174 0 1.6815 0.371848 1.02513 1.03374C0.368749 1.69563 0 2.59335 0 3.52941V24.7059C0 25.6419 0.368749 26.5397 1.02513 27.2016C1.6815 27.8634 2.57174 28.2353 3.5 28.2353H12.8397C12.394 27.691 12.0085 27.0992 11.69 26.4706H3.5C3.03587 26.4706 2.59075 26.2847 2.26256 25.9537C1.93437 25.6228 1.75 25.1739 1.75 24.7059V3.52941C1.75 3.06138 1.93437 2.61252 2.26256 2.28158C2.59075 1.95063 3.03587 1.76471 3.5 1.76471H17.5C17.9641 1.76471 18.4092 1.95063 18.7374 2.28158C19.0656 2.61252 19.25 3.06138 19.25 3.52941V12.3918C19.852 12.4471 20.4353 12.5559 21 12.7182V3.52941C21 2.59335 20.6313 1.69563 19.9749 1.03374C19.3185 0.371848 18.4283 0 17.5 0ZM15.75 7.94118C15.7501 8.14769 15.6783 8.34769 15.5472 8.50634C15.4161 8.66499 15.2339 8.77224 15.0325 8.80941L14.875 8.82353H6.125C5.90634 8.82394 5.69546 8.74177 5.53388 8.59322C5.3723 8.44467 5.27173 8.24049 5.25197 8.0209C5.23221 7.80131 5.2947 7.58222 5.42713 7.40677C5.55957 7.23132 5.75234 7.11222 5.9675 7.07294L6.125 7.05882H14.875C15.1071 7.05882 15.3296 7.15179 15.4937 7.31726C15.6578 7.48273 15.75 7.70716 15.75 7.94118Z" fill="#DB1A15" />
+                    <path d="M15.5472 13.8005C15.6783 13.6418 15.7501 13.4418 15.75 13.2353C15.75 13.0013 15.6578 12.7768 15.4937 12.6114C15.3296 12.4459 15.1071 12.3529 14.875 12.3529H6.12501L5.96751 12.3671C5.75235 12.4063 5.55958 12.5254 5.42714 12.7009C5.29471 12.8763 5.23222 13.0954 5.25198 13.315C5.27174 13.5346 5.37231 13.7388 5.53389 13.8873C5.69547 14.0359 5.90635 14.1181 6.12501 14.1176H14.875L15.0325 14.1035C15.234 14.0664 15.4161 13.9591 15.5472 13.8005Z" fill="#DB1A15" />
+                    <path d="M10.2972 19.0946C10.4283 18.9359 10.5001 18.7359 10.5 18.5294C10.5 18.2954 10.4078 18.071 10.2437 17.9055C10.0796 17.74 9.85706 17.6471 9.625 17.6471H6.12501L5.96751 17.6612C5.75235 17.7005 5.55958 17.8196 5.42714 17.995C5.29471 18.1705 5.23222 18.3895 5.25198 18.6091C5.27174 18.8287 5.37231 19.0329 5.53389 19.1815C5.69547 19.33 5.90635 19.4122 6.12501 19.4118H9.625L9.7825 19.3976C9.98395 19.3605 10.1661 19.2532 10.2972 19.0946Z" fill="#DB1A15" />
+                    <path d="M28 22.0588C28 23.1017 27.7963 24.1343 27.4006 25.0978C27.0048 26.0612 26.4247 26.9367 25.6935 27.6741C24.9622 28.4115 24.0941 28.9964 23.1386 29.3955C22.1832 29.7946 21.1592 30 20.125 30C19.0908 30 18.0668 29.7946 17.1114 29.3955C16.1559 28.9964 15.2878 28.4115 14.5565 27.6741C13.8253 26.9367 13.2452 26.0612 12.8494 25.0978C12.4537 24.1343 12.25 23.1017 12.25 22.0588C12.25 19.9527 13.0797 17.9328 14.5565 16.4436C16.0334 14.9543 18.0364 14.1176 20.125 14.1176C22.2136 14.1176 24.2166 14.9543 25.6935 16.4436C27.1703 17.9328 28 19.9527 28 22.0588ZM24.9273 18.66C24.8608 18.5928 24.7818 18.5394 24.6948 18.503C24.6079 18.4666 24.5146 18.4479 24.4205 18.4479C24.3263 18.4479 24.233 18.4666 24.1461 18.503C24.0591 18.5394 23.9801 18.5928 23.9136 18.66L18.6932 23.9257L16.3364 21.5477C16.202 21.4121 16.0197 21.336 15.8295 21.336C15.6394 21.336 15.4571 21.4121 15.3227 21.5477C15.1883 21.6833 15.1127 21.8671 15.1127 22.0588C15.1127 22.2505 15.1883 22.4344 15.3227 22.5699L18.1863 25.4576C18.2528 25.5249 18.3318 25.5782 18.4188 25.6146C18.5058 25.651 18.599 25.6697 18.6932 25.6697C18.7873 25.6697 18.8806 25.651 18.9676 25.6146C19.0545 25.5782 19.1335 25.5249 19.2 25.4576L24.9273 19.6822C24.994 19.6152 25.0469 19.5355 25.083 19.4478C25.1191 19.3601 25.1376 19.2661 25.1376 19.1711C25.1376 19.0762 25.1191 18.9821 25.083 18.8944C25.0469 18.8067 24.994 18.7271 24.9273 18.66Z" fill="#DB1A15" />
+                </svg>
+                <b id="order-id">867 291 334</b>
+            </span>
+            <span id="control-tab">
+                <svg width="29" height="32" viewBox="0 0 29 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M4.08334 4.48759C4.08334 1.94312 14.5 0 14.5 0C14.5 0 24.9167 1.94312 24.9167 4.48759C24.9167 7.87984 23.0218 9.31034 23.0218 9.31034H5.97818C5.97818 9.31034 4.08334 7.87984 4.08334 4.48759ZM16.4841 3.90706C16.4841 3.90706 15.0288 3.32215 14.5 2.73834C13.9712 3.32215 12.5159 3.90706 12.5159 3.90706C12.5159 3.90706 12.9127 7.11968 14.5 7.11968C16.0873 7.11968 16.4841 3.90706 16.4841 3.90706Z" fill="#D4D4D4" />
+                    <path d="M21.3333 11.3793C21.3333 12.2677 21.1572 13.1476 20.8146 13.9689C20.472 14.7903 19.9696 15.5372 19.3356 16.1669C18.7015 16.7966 17.9482 17.2967 17.1184 17.638C16.2886 17.9794 15.3988 18.1552 14.5 18.1552C13.6012 18.1552 12.7114 17.9794 11.8816 17.638C11.0518 17.2967 10.2985 16.7966 9.66442 16.1669C9.03038 15.5372 8.52798 14.7903 8.18541 13.9689C7.84284 13.1476 7.66666 12.2677 7.66666 11.3793" stroke="#D4D4D4" stroke-width="3" />
+                    <path d="M24.262 30H4.738C3.22584 30 2 28.7742 2 27.262C2 26.3829 2.42217 25.5572 3.13488 25.0424L5.94534 23.0125C7.00707 22.2457 8.44353 22.2562 9.49389 23.0386L12.3183 25.1423C13.318 25.8869 14.674 25.9357 15.7247 25.2649L19.5526 22.8211C20.5897 22.159 21.926 22.1973 22.9234 22.9178L25.8651 25.0424C26.5778 25.5572 27 26.3829 27 27.262C27 28.7742 25.7742 30 24.262 30Z" stroke="#D4D4D4" stroke-width="3" />
+                </svg>
+                Контроль
+            </span>
         </div>
     </div>
     
-    <div class="content">
-        <div id="ticket-content" class="tab-content active">
-            <div class="ticket-info">
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="far fa-user-pilot"></i>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-label">Перевозчик</div>
-                        <div class="info-value" id="carrier">ИП Долгушин Д.Г.</div>
-                    </div>
+    <div class="content-area">
+        <div id="ticket-content" class="ticket__info">
+            <div class="info__item">
+                <div class="image">
+                    <svg width="29" height="32" viewBox="0 0 29 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M4.08334 4.48759C4.08334 1.94312 14.5 0 14.5 0C14.5 0 24.9167 1.94312 24.9167 4.48759C24.9167 7.87984 23.0218 9.31034 23.0218 9.31034H5.97818C5.97818 9.31034 4.08334 7.87984 4.08334 4.48759ZM16.4841 3.90706C16.4841 3.90706 15.0288 3.32215 14.5 2.73834C13.9712 3.32215 12.5159 3.90706 12.5159 3.90706C12.5159 3.90706 12.9127 7.11968 14.5 7.11968C16.0873 7.11968 16.4841 3.90706 16.4841 3.90706Z" fill="#D4D4D4" />
+                        <path d="M21.3333 11.3793C21.3333 12.2677 21.1572 13.1476 20.8146 13.9689C20.472 14.7903 19.9696 15.5372 19.3356 16.1669C18.7015 16.7966 17.9482 17.2967 17.1184 17.638C16.2886 17.9794 15.3988 18.1552 14.5 18.1552C13.6012 18.1552 12.7114 17.9794 11.8816 17.638C11.0518 17.2967 10.2985 16.7966 9.66442 16.1669C9.03038 15.5372 8.52798 14.7903 8.18541 13.9689C7.84284 13.1476 7.66666 12.2677 7.66666 11.3793" stroke="#D4D4D4" stroke-width="3" />
+                        <path d="M24.262 30H4.738C3.22584 30 2 28.7742 2 27.262C2 26.3829 2.42217 25.5572 3.13488 25.0424L5.94534 23.0125C7.00707 22.2457 8.44353 22.2562 9.49389 23.0386L12.3183 25.1423C13.318 25.8869 14.674 25.9357 15.7247 25.2649L19.5526 22.8211C20.5897 22.159 21.926 22.1973 22.9234 22.9178L25.8651 25.0424C26.5778 25.5572 27 26.3829 27 27.262C27 28.7742 25.7742 30 24.262 30Z" stroke="#D4D4D4" stroke-width="3" />
+                    </svg>
                 </div>
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="far fa-bus"></i>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-label" id="route">пос.Таймир-мкрн. Тихие зори</div>
-                        <div class="info-value" id="bus">o772op124</div>
-                    </div>
+                <div class="data">
+                    <p>Перевозчик</p>
+                    <div id="carrier">ИП Долгушин Д.Г.</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="far fa-ruble-sign"></i>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-label">Стоимость</div>
-                        <div class="info-value" id="price">1 шт., Полный 44.00 ₽</div>
-                    </div>
+            </div>
+            <div class="info__item">
+                <div class="image">
+                    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M28.4962 8.9625V6C28.4962 2.691 25.8062 0 22.4983 0H7.50343C4.19556 0 1.50548 2.691 1.50548 6V8.997L1.39152 9.003C1.01335 9.03031 0.659566 9.19991 0.401378 9.47767C0.14319 9.75543 -0.000225465 10.1207 2.66064e-07 10.5V13.5C2.66064e-07 13.8978 0.157981 14.2794 0.43919 14.5607C0.720398 14.842 1.1018 15 1.49949 15H1.50548V24C1.50548 25.1025 2.10978 26.058 2.99897 26.58V28.5C2.99897 28.8978 3.15695 29.2794 3.43816 29.5607C3.71937 29.842 4.10077 30 4.49846 30H5.99795C6.39563 30 6.77703 29.842 7.05824 29.5607C7.33945 29.2794 7.49743 28.8978 7.49743 28.5V27H22.4923V28.5C22.4923 28.8978 22.6503 29.2794 22.9315 29.5607C23.2127 29.842 23.5941 30 23.9918 30H25.4913C25.889 30 26.2704 29.842 26.5516 29.5607C26.8328 29.2794 26.9908 28.8978 26.9908 28.5V26.586C27.446 26.3245 27.8247 25.948 28.0888 25.4942C28.353 25.0404 28.4935 24.5251 28.4962 24V15C28.8939 15 29.2753 14.842 29.5565 14.5607C29.8377 14.2794 29.9957 13.8978 29.9957 13.5V10.593C30.0133 10.3602 29.9764 10.1265 29.8878 9.9105C29.5834 9.18 28.9356 9.0045 28.4962 8.9625ZM25.5003 24H4.50446V16.5H25.4988L25.5003 24ZM13.5014 7.5V13.5H4.50446V7.5H13.5014ZM25.4973 7.5V13.5H16.5003V7.5H25.4973ZM7.50343 3H22.4983C23.6019 3 24.5601 3.6075 25.0804 4.5H4.92132C5.44164 3.6075 6.39981 3 7.50343 3Z" fill="#D4D4D4" />
+                        <path d="M8.25 22.5C9.49264 22.5 10.5 21.4926 10.5 20.25C10.5 19.0074 9.49264 18 8.25 18C7.00736 18 6 19.0074 6 20.25C6 21.4926 7.00736 22.5 8.25 22.5Z" fill="#D4D4D4" />
+                        <path d="M21.75 22.5C22.9926 22.5 24 21.4926 24 20.25C24 19.0074 22.9926 18 21.75 18C20.5074 18 19.5 19.0074 19.5 20.25C19.5 21.4926 20.5074 22.5 21.75 22.5Z" fill="#D4D4D4" />
+                    </svg>
                 </div>
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="far fa-calendar-day"></i>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-label">Дата покупки</div>
-                        <div class="info-value" id="date">12 мая 2024 г.</div>
-                    </div>
+                <div class="data">
+                    <p id="route">пос.Таймир-мкрн. Тихие зори</p>
+                    <div id="bus">o772op124</div>
                 </div>
-                <div class="info-item">
-                    <div class="info-icon">
-                        <i class="far fa-clock-two"></i>
-                    </div>
-                    <div class="info-content">
-                        <div class="info-label">Время покупки</div>
-                        <div class="info-value" id="time">12:38</div>
-                    </div>
+            </div>
+            <div class="info__item">
+                <div class="image">
+                    <svg width="26" height="30" viewBox="0 0 26 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M15.6 19.2C18.1461 19.2 20.5879 18.1886 22.3882 16.3882C24.1886 14.5879 25.2 12.1461 25.2 9.6C25.2 7.05392 24.1886 4.61212 22.3882 2.81178C20.5879 1.01143 18.1461 0 15.6 0H6.6C6.12261 0 5.66477 0.189642 5.32721 0.527208C4.98964 0.864773 4.8 1.32261 4.8 1.8V15.6H1.8C1.32261 15.6 0.864773 15.7896 0.527208 16.1272C0.189642 16.4648 0 16.9226 0 17.4C0 17.8774 0.189642 18.3352 0.527208 18.6728C0.864773 19.0104 1.32261 19.2 1.8 19.2H4.8V21.6H1.8C1.32261 21.6 0.864773 21.7896 0.527208 22.1272C0.189642 22.4648 0 22.9226 0 23.4C0 23.8774 0.189642 24.3352 0.527208 24.6728C0.864773 25.0104 1.32261 25.2 1.8 25.2H4.8V28.2C4.8 28.6774 4.98964 29.1352 5.32721 29.4728C5.66477 29.8104 6.12261 30 6.6 30C7.07739 30 7.53523 29.8104 7.87279 29.4728C8.21036 29.1352 8.4 28.6774 8.4 28.2V25.2H15C15.4774 25.2 15.9352 25.0104 16.2728 24.6728C16.6104 24.3352 16.8 23.8774 16.8 23.4C16.8 22.9226 16.6104 22.4648 16.2728 22.1272C15.9352 21.7896 15.4774 21.6 15 21.6H8.4V19.2H15.6ZM8.4 3.6H15.6C17.1913 3.6 18.7174 4.23214 19.8426 5.35736C20.9679 6.48258 21.6 8.0087 21.6 9.6C21.6 11.1913 20.9679 12.7174 19.8426 13.8426C18.7174 14.9679 17.1913 15.6 15.6 15.6H8.4V3.6Z" fill="#D4D4D4" />
+                    </svg>
+                </div>
+                <div class="data">
+                    <p>Стоимость</p>
+                    <div id="price">1 шт., Полный 44.00 ₽</div>
+                </div>
+            </div>
+            <div class="info__item">
+                <div class="image">
+                    <svg width="27" height="30" viewBox="0 0 27 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 27H3V10.5H24M19.5 0V3H7.5V0H4.5V3H3C1.335 3 0 4.335 0 6V27C0 27.7956 0.31607 28.5587 0.87868 29.1213C1.44129 29.6839 2.20435 30 3 30H24C24.7956 30 25.5587 29.6839 26.1213 29.1213C26.6839 28.5587 27 27.7956 27 27V6C27 5.20435 26.6839 4.44129 26.1213 3.87868C25.5587 3.31607 24.7956 3 24 3H22.5V0M13 16H5V24H13V16Z" fill="#D4D4D4" />
+                    </svg>
+                </div>
+                <div class="data">
+                    <p>Дата покупки</p>
+                    <div id="date">12 мая 2024 г.</div>
+                </div>
+            </div>
+            <div class="info__item">
+                <div class="image">
+                    <svg width="31" height="31" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.740005 15.2166C0.740005 12.4991 1.4194 9.9813 2.76487 7.67668C4.11034 5.37206 5.93539 3.54702 8.24001 2.20155C10.5446 0.856077 13.0491 0.190002 15.7533 0.190002C17.7782 0.190002 19.7231 0.589647 21.5748 1.37562C23.4265 2.16158 25.0118 3.24062 26.3572 4.57277C27.7027 5.90492 28.7684 7.5035 29.5544 9.36851C30.3404 11.2335 30.74 13.1651 30.74 15.2166C30.74 17.2415 30.3404 19.1865 29.5544 21.0381C28.7684 22.8898 27.6894 24.4884 26.3572 25.8206C25.0251 27.1527 23.4265 28.2184 21.5748 29.0044C19.7231 29.7904 17.7915 30.19 15.7533 30.19C13.7151 30.19 11.7569 29.7904 9.90519 29.0044C8.0535 28.2184 6.45493 27.1394 5.10945 25.8072C3.76398 24.4751 2.71159 22.8765 1.9123 21.0381C1.11301 19.1998 0.740005 17.2548 0.740005 15.2166ZM4.04374 15.2166C4.04374 18.3738 5.18938 21.1181 7.494 23.4493C9.79862 25.7539 12.5428 26.8996 15.7533 26.8996C17.8581 26.8996 19.8164 26.3801 21.6015 25.3277C23.3865 24.2753 24.8253 22.8632 25.8777 21.0648C26.9301 19.2664 27.4629 17.3214 27.4629 15.2166C27.4629 13.1119 26.9301 11.1536 25.8777 9.35519C24.8253 7.55679 23.3999 6.13139 21.6015 5.07899C19.8031 4.02659 17.8581 3.50705 15.7533 3.50705C13.6485 3.50705 11.6903 4.02659 9.90519 5.07899C8.12011 6.13139 6.68139 7.55679 5.61567 9.35519C4.54995 11.1536 4.04374 13.1119 4.04374 15.2166ZM14.5944 15.2166V6.34453C14.5944 6.03814 14.7009 5.77171 14.9141 5.55856C15.1272 5.34542 15.3936 5.23885 15.7 5.23885C16.0064 5.23885 16.2729 5.34542 16.486 5.55856C16.6992 5.77171 16.8057 6.03814 16.8057 6.34453V13.285L20.5091 11.1936C20.7755 11.0337 21.0553 10.9937 21.3484 11.0737C21.788 11.1936 21.8679 11.3401 22.0144 11.6198C22.1743 11.8863 22.2009 12.166 22.121 12.4591C22.0411 12.7522 21.8679 12.992 21.6015 13.1385L16.4327 16.0293C16.2317 16.2203 15.9640 16.3254 15.6867 16.3223C15.5415 16.3247 15.3973 16.2977 15.2628 16.2428C15.1283 16.1879 15.0063 16.1063 14.9042 16.003C14.8021 15.8996 14.722 15.7767 14.6688 15.6415C14.6155 15.5064 14.5902 15.3619 14.5944 15.2166Z" fill="#D4D4D4" />
+                    </svg>
+                </div>
+                <div class="data">
+                    <p>Время покупки:</p>
+                    <div id="time">12:38</div>
                 </div>
             </div>
         </div>
         
-        <div id="control-content" class="tab-content">
-            <div class="control-content">
-                <div class="qr-container">
-                    <div id="qrcode"></div>
-                </div>
-                <div class="ticket-number">№ <span id="control-ticket-number">867 291 334</span></div>
+        <div id="control-content" class="control-content">
+            <div class="qr-container">
+                <div id="qrcode"></div>
             </div>
+            <div class="ticket-number">№ <span id="control-ticket-number"></span></div>
         </div>
     </div>
     
-    <div class="footer">
-        <button class="close-button" id="close-button">закрыть</button>
+    <div class="button__wrapper">
+        <button id="close-button">закрыть</button>
     </div>
 
     <script>
@@ -291,6 +334,8 @@
                 console.error('Ошибка при обработке данных билета:', error);
                 document.body.innerHTML = '<p>Ошибка загрузки билета. Неверный формат данных.</p>';
             }
+        } else {
+            document.body.innerHTML = '<p>Данные билета не предоставлены.</p>';
         }
 
         // Переключение между вкладками
@@ -303,15 +348,15 @@
         ticketTab.addEventListener('click', () => {
             ticketTab.classList.add('active');
             controlTab.classList.remove('active');
-            ticketContent.classList.add('active');
-            controlContent.classList.remove('active');
+            ticketContent.style.display = 'block';
+            controlContent.style.display = 'none';
         });
         
         controlTab.addEventListener('click', () => {
             controlTab.classList.add('active');
             ticketTab.classList.remove('active');
-            ticketContent.classList.remove('active');
-            controlContent.classList.add('active');
+            ticketContent.style.display = 'none';
+            controlContent.style.display = 'block';
             
             // Генерируем QR-код только при первом клике
             if (!document.getElementById('qrcode').hasChildNodes()) {
@@ -340,12 +385,14 @@
             }, 1000);
         }
 
-        // Запуск таймера сразу
-        const timerDisplay = document.getElementById('timer');
-        const closeBtn = document.getElementById('close-button');
-        
-        startTimer(15, timerDisplay);
-        closeBtn.addEventListener('click', () => tg.close());
+        // Запуск таймера при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            const timerDisplay = document.getElementById('timer');
+            const closeBtn = document.getElementById('close-button');
+            
+            startTimer(15, timerDisplay);
+            closeBtn.addEventListener('click', () => tg.close());
+        });
     </script>
 </body>
 </html>
