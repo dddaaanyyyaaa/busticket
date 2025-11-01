@@ -2,19 +2,19 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Транспортный билет</title>
     <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
     <style>
         :root {
-            --bg: #212121;
-            --text: #ffffff;
-            --label: #aaaaaa;
-            --border: #303030;
+            --text: #D4D4D4;
             --accent: #E21A1A;
-            --item-height: 56px;
-            --padding: 24px;
+            --border: #303030;
+            --bg: #000;
+            --input-bg: #1A1A1A;
+            --gray: #787878;
+            --light-gray: #303030;
         }
 
         * {
@@ -24,218 +24,221 @@
         }
 
         body {
+            font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
             background: var(--bg);
             color: var(--text);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            font-variant: tabular-nums;
-            height: 100vh;
             display: flex;
             flex-direction: column;
+            height: 100vh;
             overflow: hidden;
         }
 
-        .timer-header {
-            text-align: center;
-            font-size: 4.5vh;
-            padding: 1vh 0;
-            color: var(--text);
+        p { margin: 0; }
+
+        .app__header {
+            border-bottom: 1px solid var(--border);
+            padding-top: 10px;
+            flex-shrink: 0;
         }
 
-        .tabs {
+        .effective {
+            font-size: 20px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .navbar {
             display: flex;
             justify-content: center;
-            gap: 32px;
-            margin: 8px 0 16px;
-            position: relative;
+            gap: 20px;
         }
 
-        .tab {
+        .navbar span {
+            font-size: 16px;
+            font-weight: 500;
+            padding: 0 13px 11px;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
             display: flex;
             align-items: center;
             gap: 6px;
-            padding: 8px 0;
-            font-size: 16px;
-            color: var(--label);
             cursor: pointer;
         }
 
-        .tab.active {
+        .navbar span.active {
+            border-color: var(--accent);
             color: var(--accent);
         }
 
-        .tab svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
+        .navbar span svg path,
+        .navbar span svg {
+            fill: var(--text);
+            stroke: var(--text);
         }
 
-        .tab-ink-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 120px;
-            height: 3px;
-            background: var(--accent);
-            border-radius: 2px;
-            transition: left 0.3s;
+        .navbar span.active svg path,
+        .navbar span.active svg {
+            fill: var(--accent);
+            stroke: var(--accent);
         }
 
         .content-area {
             flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .ticket__info,
+        .control-content {
+            padding: 15px 20px 0;
+            width: 100%;
+            height: 100%;
             overflow-y: auto;
-            padding: 0 var(--padding);
         }
 
-        .ticket-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .control-content {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background: var(--bg);
         }
 
-        .ticket-item {
+        .info__item {
+            border-bottom: 1px solid var(--border);
+            padding: 6px 0 10px;
             display: flex;
             align-items: center;
-            gap: 16px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
+            gap: 5px;
         }
 
-        .ticket-icon {
-            min-width: 48px;
-            height: 48px;
+        .info__item:last-child {
+            border-bottom: 0;
+        }
+
+        .image {
+            min-width: 45px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .ticket-icon svg {
-            width: 28px;
-            height: 28px;
-            fill: var(--text);
+        .image svg {
+            width: 24px;
+            height: 24px;
+            display: block;
         }
 
-        .ticket-label {
-            font-size: 14px;
-            color: var(--label);
-            margin-bottom: 2px;
+        .data p {
+            font-size: 16px;
+            color: var(--gray);
+            font-weight: 500;
+            margin-bottom: 4px;
         }
 
-        .ticket-value {
-            font-size: 18px;
+        .data div {
+            font-size: 22px;
             color: var(--text);
             font-weight: 500;
         }
 
-        .control-content {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 24px;
-            text-align: center;
-        }
-
         .qr-container {
-            margin: 20px 0;
-            padding: 12px;
+            margin: 20px auto;
+            padding: 15px;
             background: white;
-            border-radius: 12px;
+            border-radius: 10px;
             display: inline-block;
         }
 
         #qrcode {
-            width: 180px;
-            height: 180px;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
         }
 
         .ticket-number {
-            font-size: 20px;
-            font-weight: 600;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
             color: var(--text);
-            margin-top: 16px;
         }
 
         .button__wrapper {
-            padding: 16px var(--padding) 32px;
-            background: var(--bg);
+            padding: 10px 20px 30px;
+            background: var(--input-bg);
             flex-shrink: 0;
         }
 
         .button__wrapper button {
-            height: 48px;
-            width: 100%;
-            background: var(--accent);
-            color: white;
+            padding: 10px 20px;
+            color: #fff;
             font-size: 17px;
             font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 48px;
+            width: 100%;
+            max-width: 100%;
+            border-radius: 10px;
+            background: var(--accent);
             border: none;
-            border-radius: 12px;
+            outline: none;
             cursor: pointer;
             text-transform: uppercase;
         }
     </style>
 </head>
 <body>
-    <div class="timer-header">Действует: <span id="timer">15 сек.</span></div>
-
-    <div class="tabs">
-        <div class="tab active" data-tab="ticket" id="ticket-tab">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/></svg>
-            <span>Билет</span>
+    <div class="app__header">
+        <div class="effective">Действует: <span id="timer">15 сек.</span></div>
+        <div class="navbar">
+            <span class="active" id="ticket-tab">
+                <svg width="28" height="30" viewBox="0 0 28 30"><path d="M17.5 0H3.5C2.57174 0 1.6815 0.371848 1.02513 1.03374..."/></svg>
+                <b id="order-id">867 291 334</b>
+            </span>
+            <span id="control-tab">
+                <svg width="29" height="32" viewBox="0 0 29 32"><path d="M4.08334 4.48759C4.08334 1.94312..."/></svg>
+                Контроль
+            </span>
         </div>
-        <div class="tab" data-tab="control" id="control-tab">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" fill="currentColor"/></svg>
-            <span>Контроль</span>
-        </div>
-        <div class="tab-ink-bar" id="tab-ink"></div>
     </div>
 
     <div class="content-area">
-        <div id="ticket-content">
-            <div class="ticket-list">
-                <div class="ticket-item">
-                    <div class="ticket-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor"/></svg>
-                    </div>
-                    <div class="ticket-content">
-                        <div class="ticket-label">Перевозчик</div>
-                        <div class="ticket-value" id="carrier">ООО Практик</div>
-                    </div>
+        <div id="ticket-content" class="ticket__info">
+            <div class="info__item">
+                <div class="image"><svg width="29" height="32"><path d="M4.08334 4.48759..."/></svg></div>
+                <div class="data">
+                    <p>Перевозчик</p>
+                    <div id="carrier">ИП Долгушин Д.Г.</div>
                 </div>
-                <div class="ticket-item">
-                    <div class="ticket-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.22.42-1.42 1.01L3 12v8c0 1.1.9 2 2 2h4l2 2h8c1.1 0 2-.9 2-2v-8l-2.08-5.99zM12 18c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm2-12H10v4h4V6z" fill="currentColor"/></svg>
-                    </div>
-                    <div class="ticket-content">
-                        <div class="ticket-label">Маршрут</div>
-                        <div class="ticket-value" id="route">ЛДК - ТЭЦ-3</div>
-                    </div>
+            </div>
+            <div class="info__item">
+                <div class="image"><svg width="30" height="30"><path d="M28.4962 8.9625..."/></svg></div>
+                <div class="data">
+                    <p>Маршрут</p>
+                    <div id="route">пос.Таймир-мкрн. Тихие зори</div>
                 </div>
-                <div class="ticket-item">
-                    <div class="ticket-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z" fill="currentColor"/></svg>
-                    </div>
-                    <div class="ticket-content">
-                        <div class="ticket-label">Стоимость</div>
-                        <div class="ticket-value" id="price">1 шт., Полный, 48.00 ₽</div>
-                    </div>
+            </div>
+            <div class="info__item">
+                <div class="image"><svg width="26" height="30"><path d="M15.6 19.2..."/></svg></div>
+                <div class="data">
+                    <p>Стоимость</p>
+                    <div id="price">1 шт., Полный 44.00 ₽</div>
                 </div>
-                <div class="ticket-item">
-                    <div class="ticket-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z" fill="currentColor"/></svg>
-                    </div>
-                    <div class="ticket-content">
-                        <div class="ticket-label">Дата покупки</div>
-                        <div class="ticket-value" id="date">16 октября 2025 г.</div>
-                    </div>
+            </div>
+            <div class="info__item">
+                <div class="image"><svg width="27" height="30"><path d="M24 27H3V10.5..."/></svg></div>
+                <div class="data">
+                    <p>Дата покупки</p>
+                    <div id="date">12 мая 2024 г.</div>
                 </div>
-                <div class="ticket-item">
-                    <div class="ticket-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" fill="currentColor"/></svg>
-                    </div>
-                    <div class="ticket-content">
-                        <div class="ticket-label">Время покупки</div>
-                        <div class="ticket-value" id="time">15:17</div>
-                    </div>
+            </div>
+            <div class="info__item">
+                <div class="image"><svg width="31" height="31"><path d="M0.740005 15.2166..."/></svg></div>
+                <div class="data">
+                    <p>Время покупки:</p>
+                    <div id="time">12:38</div>
                 </div>
             </div>
         </div>
@@ -253,27 +256,35 @@
     </div>
 
     <script>
+        // Telegram Mini App
         const tg = Telegram.WebApp;
         tg.expand();
         tg.enableClosingConfirmation();
 
+        // Получение параметра из URL
         const getParam = name => new URLSearchParams(window.location.search).get(name);
+
+        // Парсинг данных
         const data = getParam('data');
         const ticket = data ? JSON.parse(atob(data)) : null;
 
         if (!ticket) {
-            document.body.innerHTML = '<p style="text-align:center; padding:40px; color:#aaa">Данные билета не предоставлены.</p>';
+            document.body.innerHTML = '<p>Данные билета не предоставлены.</p>';
             setTimeout(() => tg.close(), 3000);
             throw new Error();
         }
 
+        // Форматирование номера
         const formatNum = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
         const ticketNum = formatNum(ticket.number);
 
+        // Заполнение полей
         Object.entries({
+            'order-id': ticketNum,
             'carrier': ticket.carrier,
             'route': ticket.route_name,
-            'price': `${ticket.quantity} шт., Полный, ${ticket.total_price}.00 ₽`,
+            'bus': ticket.bus_number,
+            'price': `${ticket.quantity} шт., Полный ${ticket.total_price},00 ₽`,
             'date': ticket.purchase_date,
             'time': ticket.purchase_time,
             'control-ticket-number': ticketNum
@@ -282,35 +293,22 @@
             if (el) el.textContent = val;
         });
 
-        const ticketTab = document.getElementById('ticket-tab');
-        const controlTab = document.getElementById('control-tab');
-        const ticketContent = document.getElementById('ticket-content');
-        const controlContent = document.getElementById('control-content');
-        const inkBar = document.getElementById('tab-ink');
-
-        const updateInk = (tab) => {
-            inkBar.style.left = tab === 'ticket' ? '0' : '128px';
+        // Переключение вкладок
+        const showTab = (tab) => {
+            document.getElementById('ticket-content').style.display = tab === 'ticket' ? 'block' : 'none';
+            document.getElementById('control-content').style.display = tab === 'control' ? 'block' : 'none';
+            document.getElementById('ticket-tab').classList.toggle('active', tab === 'ticket');
+            document.getElementById('control-tab').classList.toggle('active', tab === 'control');
         };
 
-        ticketTab.onclick = () => {
-            ticketTab.classList.add('active');
-            controlTab.classList.remove('active');
-            ticketContent.style.display = 'block';
-            controlContent.style.display = 'none';
-            updateInk('ticket');
-        };
-
-        controlTab.onclick = () => {
-            controlTab.classList.add('active');
-            ticketTab.classList.remove('active');
-            ticketContent.style.display = 'none';
-            controlContent.style.display = 'flex';
-            updateInk('control');
+        document.getElementById('ticket-tab').onclick = () => showTab('ticket');
+        document.getElementById('control-tab').onclick = () => {
+            showTab('control');
             if (!document.getElementById('qrcode').firstChild) {
                 new QRCode(document.getElementById('qrcode'), {
                     text: ticket.number.toString(),
-                    width: 180,
-                    height: 180,
+                    width: 200,
+                    height: 200,
                     colorDark: "#000",
                     colorLight: "#fff",
                     correctLevel: QRCode.CorrectLevel.H
@@ -318,6 +316,7 @@
             }
         };
 
+        // Таймер
         const timerEl = document.getElementById('timer');
         let timeLeft = 15;
         const countdown = setInterval(() => {
@@ -328,6 +327,7 @@
             }
         }, 1000);
 
+        // Кнопка закрытия
         document.getElementById('close-button').onclick = () => tg.close();
     </script>
 </body>
