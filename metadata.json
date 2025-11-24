@@ -1,5 +1,0 @@
-{
-  "name": "Transport Ticket App",
-  "description": "A Telegram Mini App for displaying transport ticket details with QR control.",
-  "requestFramePermissions": []
-}
